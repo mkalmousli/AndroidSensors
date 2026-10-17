@@ -18,8 +18,8 @@ int64_t NowNs() {
     return int64_t(ts.tv_sec) * 1000000000LL + ts.tv_nsec;
 }
 
-Store::Store(Header* hdr, size_t size, bool writer)
-    : hdr_(hdr), slots_(reinterpret_cast<Slot*>(hdr + 1)), size_(size), writer_(writer) {}
+Store::Store(Header* hdr, bool writer)
+    : hdr_(hdr), slots_(reinterpret_cast<Slot*>(hdr + 1)), writer_(writer) {}
 
 Store* Store::Open(const char* path, bool writer) {
     int fd = open(path, writer ? (O_RDWR | O_CREAT | O_CLOEXEC) : (O_RDONLY | O_CLOEXEC), 0664);
@@ -28,7 +28,7 @@ Store* Store::Open(const char* path, bool writer) {
     void* map = mmap(nullptr, kSize, writer ? PROT_READ | PROT_WRITE : PROT_READ, MAP_SHARED, fd, 0);
     close(fd);
     if (map == MAP_FAILED) return nullptr;
-    auto* store = new Store(static_cast<Header*>(map), kSize, writer);
+    auto* store = new Store(static_cast<Header*>(map), writer);
     if (writer && store->hdr_->magic != kMagic) {
         for (int i = 0; i < kSensorCount; ++i) store->Write(i, kSensors[i].init, kSensors[i].n);
         store->hdr_->count = kSensorCount;

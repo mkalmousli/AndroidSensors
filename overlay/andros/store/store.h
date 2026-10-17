@@ -39,10 +39,9 @@ class Store {
     uint64_t Generation() const { return hdr_->generation.load(std::memory_order_acquire); }
 
   private:
-    Store(Header* hdr, size_t size, bool writer);
+    Store(Header* hdr, bool writer);
     Header* hdr_;
     Slot* slots_;
-    size_t size_;
     bool writer_;
 };
 
