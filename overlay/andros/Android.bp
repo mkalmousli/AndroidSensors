@@ -1,0 +1,6 @@
+// Generated catalog header (see templates/catalog_gen.h.j2), shared by all modules.
+cc_library_headers {
+    name: "andros_catalog",
+    vendor: true,
+    export_include_dirs: ["gen"],
+}

@@ -1,0 +1,25 @@
+// Multihal sensors sub-HAL whose data source is the andros store.
+cc_library_shared {
+    name: "andros_sensors_subhal",
+    stem: "sensors.andros",
+    vendor: true,
+    relative_install_path: "hw",
+    srcs: ["*.cpp"],
+    static_libs: [
+        "libandros_store",
+        "android.hardware.sensors@1.0-convert",
+        "android.hardware.sensors@2.X-shared-utils",
+    ],
+    header_libs: ["android.hardware.sensors@2.X-multihal.header"],
+    shared_libs: [
+        "android.hardware.sensors@1.0",
+        "android.hardware.sensors@2.0",
+        "android.hardware.sensors@2.1",
+        "libbase",
+        "libcutils",
+        "libhidlbase",
+        "liblog",
+        "libutils",
+    ],
+    cflags: ["-Wall", "-Werror", "-Wno-unused-parameter"],
+}

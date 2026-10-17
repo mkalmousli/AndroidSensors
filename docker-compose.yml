@@ -1,0 +1,25 @@
+# builder: sync/patch/build AOSP.  android: boot the result (needs /dev/kvm).
+x-asp: &asp
+  build: .
+  image: androidsensors:latest
+  environment:
+    ASP_BRANCH: ${ASP_BRANCH:-android-14.0.0_r1}
+  volumes:
+    - aosp:/aosp
+    - ccache:/ccache
+
+services:
+  builder:
+    <<: *asp
+    profiles: ["build"]
+  android:
+    <<: *asp
+    command: asp run
+    devices: ["/dev/kvm"]
+    ports:
+      - "${ASP_HTTP_PORT:-8000}:8000"   # GraphQL, served by the OS itself
+      - "${ASP_ADB_PORT:-5555}:5555"    # adb
+
+volumes:
+  aosp:
+  ccache:

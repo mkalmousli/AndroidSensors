@@ -1,0 +1,2 @@
+/vendor/bin/graphqld                  u:object_r:andros_graphqld_exec:s0
+/data/vendor/andros(/.*)?             u:object_r:andros_data_file:s0

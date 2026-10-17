@@ -1,0 +1,19 @@
+cc_binary {
+    name: "andros_gnss",
+    stem: "android.hardware.gnss-service.andros",
+    vendor: true,
+    relative_install_path: "hw",
+    srcs: ["*.cpp"],
+    static_libs: ["libandros_store"],
+    shared_libs: [
+        "android.hardware.gnss-V2-ndk",
+        "android.hardware.gnss.measurement_corrections-V1-ndk",
+        "android.hardware.gnss.visibility_control-V1-ndk",
+        "libbase",
+        "libbinder_ndk",
+        "liblog",
+    ],
+    init_rc: ["gnss.rc"],
+    vintf_fragments: ["gnss.xml"],
+    cflags: ["-Wall", "-Werror", "-Wno-unused-parameter"],
+}

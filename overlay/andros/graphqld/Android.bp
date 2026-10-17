@@ -1,0 +1,9 @@
+cc_binary {
+    name: "andros_graphqld",
+    stem: "graphqld",
+    vendor: true,
+    srcs: ["*.cpp"],
+    static_libs: ["libandros_store"],
+    init_rc: ["graphqld.rc"],
+    cflags: ["-Wall", "-Werror"],
+}

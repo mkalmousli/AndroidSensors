@@ -1,0 +1,7 @@
+# The stock HAL domains read the store written by graphqld.
+allow hal_sensors_default andros_data_file:dir search;
+allow hal_sensors_default andros_data_file:file r_file_perms;
+allow hal_health_default andros_data_file:dir search;
+allow hal_health_default andros_data_file:file r_file_perms;
+allow hal_gnss_default andros_data_file:dir search;
+allow hal_gnss_default andros_data_file:file r_file_perms;

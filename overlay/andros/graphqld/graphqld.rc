@@ -1,0 +1,9 @@
+on post-fs-data
+    mkdir /data/vendor/andros 0775 system system
+
+service vendor.andros-graphqld /vendor/bin/graphqld 8000 /data/vendor/andros/sensors.store
+    class main
+    user system
+    group system inet
+    seclabel u:r:andros_graphqld:s0
+    restart_period 5

@@ -1,0 +1,7 @@
+service vendor.health-andros /vendor/bin/hw/android.hardware.health-service.andros
+    class hal
+    user system
+    group system
+    capabilities WAKE_ALARM BLOCK_SUSPEND
+    file /dev/kmsg w
+    interface aidl android.hardware.health.IHealth/default

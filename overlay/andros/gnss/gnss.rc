@@ -1,0 +1,5 @@
+service vendor.gnss-andros /vendor/bin/hw/android.hardware.gnss-service.andros
+    class hal
+    user system
+    group system
+    interface aidl android.hardware.gnss.IGnss/default

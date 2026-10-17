@@ -1,0 +1,16 @@
+# graphqld: owns the sample store and serves GraphQL over TCP.
+type andros_graphqld, domain;
+type andros_graphqld_exec, exec_type, vendor_file_type, file_type;
+type andros_data_file, file_type, data_file_type;
+
+init_daemon_domain(andros_graphqld)
+net_domain(andros_graphqld)
+
+allow andros_graphqld andros_data_file:dir create_dir_perms;
+allow andros_graphqld andros_data_file:file create_file_perms;
+allow andros_graphqld self:tcp_socket { create bind listen accept read write getattr setopt };
+allow andros_graphqld node:tcp_socket node_bind;
+allow andros_graphqld port:tcp_socket name_bind;
+
+# Tune with `adb logcat -b events | grep avc` on the first real boot.
+userdebug_or_eng(`permissive andros_graphqld;')

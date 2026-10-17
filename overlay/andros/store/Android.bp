@@ -1,0 +1,9 @@
+cc_library_static {
+    name: "libandros_store",
+    vendor: true,
+    srcs: ["store.cpp"],
+    export_include_dirs: ["."],
+    header_libs: ["andros_catalog"],
+    export_header_lib_headers: ["andros_catalog"],
+    cflags: ["-Wall", "-Werror"],
+}
