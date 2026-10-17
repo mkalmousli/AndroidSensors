@@ -3,7 +3,7 @@ GEN := build/gen
 CXXFLAGS := -std=c++17 -Wall -Wextra -I$(GEN) -Ioverlay/andros/store -Ioverlay/andros/graphqld
 CORE := overlay/andros/store/store.cpp $(filter-out %/main.cpp,$(wildcard overlay/andros/graphqld/*.cpp))
 
-.PHONY: test-poller help build run verify shell quick test test-cpp gen lint clean
+.PHONY: cloud test-poller help build run verify shell quick test test-cpp gen lint clean
 
 help:
 	@echo "make build   - sync + patch + build the Android image in Docker (hours, first time)"
@@ -14,6 +14,8 @@ help:
 
 build:
 	docker compose --profile build run --rm builder asp all
+cloud:
+	bash cloud/gcp_build.sh
 run:
 	docker compose up android
 verify:

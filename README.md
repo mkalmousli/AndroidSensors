@@ -31,6 +31,18 @@ curl -s localhost:8000/graphql -d '{"query":"mutation { setLight(lux: 900) { ok 
 adb shell dumpsys sensorservice | grep -i andros
 ```
 
+## Build in the cloud and publish to GitHub (Google Cloud trial credit)
+In [Cloud Shell](https://shell.cloud.google.com), with a fine-grained GitHub token
+(*Contents: read and write* on this repo):
+```sh
+git clone https://github.com/mkalmousli/AndroidSensors && cd AndroidSensors
+GITHUB_TOKEN=github_pat_xxx bash cloud/gcp_build.sh      # or: MACHINE=n2-standard-32 ...
+```
+It creates a VM, builds with `asp release`, uploads the emulator image as a GitHub **pre-release**
+(split into <2 GB parts + `SHA256SUMS`; rejoin with `cat sdk-repo-*.zip.* > images.zip`) and then
+**deletes the VM**. On failure it uploads the build log instead. A 14 h cap deletes a stuck VM.
+Defaults: `n2-highmem-8` (fits trial CPU quota, ~6-8 h, a few dollars), 500 GB disk.
+
 ## What gets patched
 `asp patch` installs `overlay/andros` as `vendor/andros` in the AOSP tree and defines the product
 `andros_x86_64` (inherits `sdk_phone64_x86_64`). **No stock source file is edited.**
