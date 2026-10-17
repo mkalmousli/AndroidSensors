@@ -1,14 +1,13 @@
 cc_binary {
     name: "andros_health",
     stem: "android.hardware.health-service.andros",
+    defaults: ["libhealth_aidl_common_defaults"],
     vendor: true,
     relative_install_path: "hw",
     srcs: ["*.cpp"],
     static_libs: [
         "libandros_store",
-        "libhealthloop",
         "libhealth_aidl_impl",
-        "libhealthshim",
     ],
     shared_libs: [
         "android.hardware.health-V2-ndk",

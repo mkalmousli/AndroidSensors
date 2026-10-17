@@ -7,8 +7,6 @@ cc_binary {
     static_libs: ["libandros_store"],
     shared_libs: [
         "android.hardware.gnss-V2-ndk",
-        "android.hardware.gnss.measurement_corrections-V1-ndk",
-        "android.hardware.gnss.visibility_control-V1-ndk",
         "libbase",
         "libbinder_ndk",
         "liblog",
