@@ -15,7 +15,7 @@ def build(args) -> None:
     account = setup.compute_account(proj)
     setup.grant_roles(proj, account)
     spec = vm.VmSpec(proj, account, repo, args.ref, args.aosp_branch or Config().branch,
-                     args.zone, args.machine, args.disk_gb, args.max_hours)
+                     args.zone, args.machine, args.disk_gb, args.max_hours, args.disk_type)
     name = vm.create(spec)
     print(f"\nStarted {name}. It builds, publishes to https://github.com/{repo}/releases and "
           f"deletes itself.\nFollow it: uv run asp cloud logs   |   Status: uv run asp cloud status")

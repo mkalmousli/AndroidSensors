@@ -22,6 +22,7 @@ class VmSpec:
     machine: str = "n2-highmem-8"
     disk_gb: int = 500
     max_hours: int = 14
+    disk_type: str = "pd-standard"
 
 
 def create(spec: VmSpec) -> str:
@@ -30,7 +31,7 @@ def create(spec: VmSpec) -> str:
             f"asp-aosp-branch={spec.aosp_branch}")
     gcloud("compute", "instances", "create", name, "--project", spec.project,
            "--zone", spec.zone, "--machine-type", spec.machine,
-           "--boot-disk-size", f"{spec.disk_gb}GB", "--boot-disk-type", "pd-balanced",
+           "--boot-disk-size", f"{spec.disk_gb}GB", "--boot-disk-type", spec.disk_type,
            "--image-family", "ubuntu-2204-lts", "--image-project", "ubuntu-os-cloud",
            "--service-account", spec.account, "--scopes", "cloud-platform",
            "--max-run-duration", f"{spec.max_hours}h", "--instance-termination-action", "DELETE",

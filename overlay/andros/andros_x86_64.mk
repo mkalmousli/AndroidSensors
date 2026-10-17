@@ -1,6 +1,6 @@
 # Emulator product with sensors, location and battery served by our own HALs.
 # @REMOVE_PACKAGES@ is substituted by `asp patch` (ASP_REMOVE_PACKAGES).
-$(call inherit-product, $(SRC_TARGET_DIR)/product/sdk_phone64_x86_64.mk)
+$(call inherit-product, device/generic/goldfish/64bitonly/product/sdk_phone64_x86_64.mk)
 include vendor/andros/gen/andros_features.mk
 
 PRODUCT_NAME := andros_x86_64

@@ -1,51 +1,78 @@
 # AndroidSensors
 
-Patches AOSP so every sensor is a **real system sensor** (HAL level, visible to `SensorManager`,
-`LocationManager`, `BatteryManager`, `dumpsys`) and is **read and written through a GraphQL API served by
-the OS itself**. No extra APKs, no helper apps, no third-party Docker images. Python + [uv] drive
-everything; the whole pipeline runs in a Dockerfile of our own (plain Ubuntu).
-
-```
-App → framework → sensors / GNSS / health HAL ─┐   (read-only mmap)
-                                               ├── /data/vendor/andros/sensors.store
-GraphQL client ⇄ graphqld (vendor init service) ┘   (single writer, seqlock)
-```
-
-## Quick start
-Needs a Linux host with Docker, `/dev/kvm`, ~300 GB disk and 32 GB RAM (first build takes hours).
-
-```sh
-make build     # repo sync + patch + build AOSP inside Docker (cached in volumes)
-make run       # boot the emulator;  http://localhost:8000  (console)  adb: localhost:5555
-make verify    # end-to-end check against the booted device
-```
+An Android 14 emulator image where every sensor (accelerometer, light, GPS, battery, ...) is a **real
+system sensor**, and you read and set them through a **GraphQL API served by the OS itself**.
+No helper apps. Apps, `SensorManager` and `dumpsys` see normal hardware.
 
 ```graphql
-query    { accelerometer { x y z }  location { lat lon alt }  battery { level charging }  sensors { name values } }
-mutation { setLocation(lat: 52.52, lon: 13.4) { ok }  setAccelerometer(x: 0, y: 9.81, z: 0) { ok }
-           setBattery(level: 42, charging: 1) { ok }  setSensor(name: "light", values: [800]) { ok } }
-subscription { light { lux } }      # server-sent events: GET /graphql?query=subscription{light{lux}}
-```
-```sh
-curl -s localhost:8000/graphql -d '{"query":"mutation { setLight(lux: 900) { ok } }"}'
-adb shell dumpsys sensorservice | grep -i andros
+query    { accelerometer { x y z }  location { lat lon }  battery { level charging } }
+mutation { setLocation(lat: 52.52, lon: 13.4) { ok }  setAccelerometer(x: 0, y: 9.81, z: 0) { ok } }
 ```
 
-## Build in the cloud and publish to GitHub (Google Cloud trial credit)
-Uses the `gcloud` and `gh` already logged in on your machine (`gcloud auth login`,
-`gcloud config set project <id>`, `gh auth login`); no token to create by hand.
+## 1. Use it (no clone, no build)
+
+You need the [Android SDK](https://developer.android.com/studio) (for `emulator` and `avdmanager`) and a
+Linux machine with KVM.
+
+**Download** the latest build. It comes in parts because GitHub limits files to 2 GB:
+```sh
+mkdir andros && cd andros
+curl -s https://api.github.com/repos/mkalmousli/AndroidSensors/releases/latest \
+  | grep -o 'https://[^"]*releases/download[^"]*' | xargs -n1 curl -LO
+```
+
+**Join** the parts and unpack them into your SDK:
+```sh
+cat sdk-repo-*.zip.* > andros.zip
+unzip andros.zip -d $ANDROID_HOME/system-images/android-34/andros
+```
+
+**Create and start** the virtual device:
+```sh
+avdmanager create avd -n andros -k "system-images;android-34;andros;x86_64"
+emulator -avd andros
+```
+
+**Use the sensors** through GraphQL (here: set the light sensor to 900 lux):
+```sh
+adb forward tcp:8000 tcp:8000
+curl localhost:8000/graphql -d '{"query":"mutation { setLight(lux: 900) { ok } }"}'
+```
+
+It is a normal emulator, so `scrcpy`, `adb` and your own Dockerfiles work as usual.
+
+## 2. Build it yourself
+
+The build downloads AOSP and takes hours (8+ cores, 32+ GB RAM, ~400 GB disk). Pick one place to run it.
+
+### On Google Cloud (easiest, a few dollars, runs unattended)
+Needs `gcloud` and `gh` logged in (`gcloud auth login`, `gcloud config set project <id>`, `gh auth login`),
+and [uv].
 ```sh
 git clone https://github.com/mkalmousli/AndroidSensors && cd AndroidSensors
-uv run asp cloud build          # enables APIs, stores your gh token in Secret Manager, starts the VM
-uv run asp cloud logs           # follow the build   (also: asp cloud status)
-uv run asp cloud fetch          # later: download + rejoin the built emulator image
-uv run asp cloud cleanup        # delete any leftover build VM
+uv run asp cloud build      # starts a VM that builds, publishes a GitHub release, then deletes itself
+uv run asp cloud logs       # follow it  (also: asp cloud status, asp cloud cleanup)
 ```
-The VM builds with `asp release`, uploads the emulator image as a GitHub **pre-release** (split into
-<2 GB parts + `SHA256SUMS`) and then **deletes itself**. On failure it uploads the build log instead
-(`failed-*` release). A 14 h cap deletes a stuck VM. Options: `--machine n2-standard-32`, `--zone`,
-`--disk-gb`, `--ref`, `--aosp-branch`. Default `n2-highmem-8` fits the trial CPU quota (~6-8 h, a few
-dollars). If `--max-run-duration` is rejected by your gcloud, update gcloud.
+It takes about 8-12 hours and costs roughly $5-8. A 14 h limit deletes a stuck VM. If the build fails,
+a `failed-*` release with the log is published instead. Options: `--machine`, `--zone`, `--disk-gb`,
+`--disk-type` (default `pd-standard`; SSD types need more quota), `--ref`, `--aosp-branch`.
+
+### On your own Linux machine (Docker)
+Needs Docker and `/dev/kvm`.
+```sh
+git clone https://github.com/mkalmousli/AndroidSensors && cd AndroidSensors
+make build     # sync + patch + build AOSP inside Docker (cached between runs)
+make run       # boot it: console http://localhost:8000, adb localhost:5555
+make verify    # end-to-end check
+```
+
+### On another cloud or server
+Any Linux box with Docker works like the local option above. To also publish the result to GitHub:
+```sh
+docker build -t androidsensors .
+docker run --rm -e ASP_GITHUB_TOKEN=<token with repo scope> -e ASP_REPO=<owner>/<repo> \
+  -v aosp:/aosp -v ccache:/ccache androidsensors asp release
+```
 
 ## What gets patched
 `asp patch` installs `overlay/andros` as `vendor/andros` in the AOSP tree and defines the product

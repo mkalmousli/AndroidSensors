@@ -14,6 +14,8 @@ def register(sub) -> None:
     b.add_argument("--zone", default="us-central1-a")
     b.add_argument("--machine", default="n2-highmem-8", help="e.g. n2-standard-32 if quota allows")
     b.add_argument("--disk-gb", type=int, default=500)
+    b.add_argument("--disk-type", default="pd-standard",
+                   help="pd-standard (HDD quota) or pd-balanced/pd-ssd (SSD quota, 250GB default)")
     b.add_argument("--max-hours", type=int, default=14, help="VM is deleted after this long")
     f = actions.add_parser("fetch", help="download and rejoin the newest built image")
     f.add_argument("--out", default="build/images")

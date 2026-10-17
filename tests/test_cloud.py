@@ -32,7 +32,8 @@ def fake(monkeypatch):
 
 def build_args(**over):
     base = {"repo": None, "ref": "main", "aosp_branch": "android-14.0.0_r1",
-            "zone": "us-central1-a", "machine": "n2-highmem-8", "disk_gb": 500, "max_hours": 14}
+            "zone": "us-central1-a", "machine": "n2-highmem-8", "disk_gb": 500, "max_hours": 14,
+            "disk_type": "pd-standard"}
     return argparse.Namespace(**{**base, **over})
 
 
