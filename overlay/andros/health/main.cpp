@@ -1,6 +1,7 @@
 #include <android-base/logging.h>
 #include <android/binder_interface_utils.h>
 #include <health-impl/HalHealthLoop.h>
+#include <health/utils.h>
 
 #include "andros_health.h"
 

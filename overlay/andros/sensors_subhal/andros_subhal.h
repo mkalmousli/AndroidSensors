@@ -35,9 +35,7 @@ class AndrosSubHal : public ISensorsSubHal {
     Return<Result> injectSensorData_2_1(const sensors::V2_1::Event& event) override;
     Return<void> debug(const hidl_handle& fd, const hidl_vec<hidl_string>& args) override;
 
-    // V2_0 / direct-channel entry points are not supported by this sub-HAL.
-    Return<void> getSensorsList(getSensorsList_cb cb) override;
-    Return<Result> injectSensorData(const sensors::V1_0::Event&) override;
+    // direct-channel entry points are not supported by this sub-HAL.
     Return<void> registerDirectChannel(const SharedMemInfo&, registerDirectChannel_cb cb) override;
     Return<Result> unregisterDirectChannel(int32_t) override;
     Return<void> configDirectReport(int32_t, int32_t, RateLevel, configDirectReport_cb cb) override;

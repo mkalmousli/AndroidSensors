@@ -46,7 +46,7 @@ int main() {
     for (const Event& e : got) {
         if (e.sensorHandle == accel) { ++accel_n; CHECK(e.u.data[1] == 2.0f); }
         if (e.sensorHandle == light) ++light_n;
-        if (e.sensorHandle == 0) ++flushes;
+        if (e.sensorType == android::hardware::sensors::V2_1::SensorType::META_DATA) ++flushes;
     }
     CHECK(accel_n >= 5);
     CHECK(light_n == 1);  // on-change: once at activation, value never changed

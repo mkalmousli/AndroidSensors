@@ -51,15 +51,6 @@ Return<void> AndrosSubHal::debug(const hidl_handle&, const hidl_vec<hidl_string>
     return Void();
 }
 
-Return<void> AndrosSubHal::getSensorsList(getSensorsList_cb cb) {
-    cb({});
-    return Void();
-}
-
-Return<Result> AndrosSubHal::injectSensorData(const sensors::V1_0::Event&) {
-    return Result::INVALID_OPERATION;
-}
-
 Return<void> AndrosSubHal::registerDirectChannel(const SharedMemInfo&, registerDirectChannel_cb cb) {
     cb(Result::INVALID_OPERATION, -1);
     return Void();

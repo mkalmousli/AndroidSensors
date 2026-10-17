@@ -26,6 +26,10 @@ class AndrosGnss : public gnss::BnGnss {
     ScopedAStatus injectLocation(const gnss::GnssLocation&) override { return ScopedAStatus::ok(); }
     ScopedAStatus injectBestLocation(const gnss::GnssLocation&) override { return ScopedAStatus::ok(); }
     ScopedAStatus deleteAidingData(GnssAidingData) override { return ScopedAStatus::ok(); }
+    ScopedAStatus startSvStatus() override { return ScopedAStatus::ok(); }
+    ScopedAStatus stopSvStatus() override { return ScopedAStatus::ok(); }
+    ScopedAStatus startNmea() override { return ScopedAStatus::ok(); }
+    ScopedAStatus stopNmea() override { return ScopedAStatus::ok(); }
     ScopedAStatus setPositionMode(const PositionModeOptions& o) override;
 
     // Optional extensions are reported as unavailable (see gnss_extensions.cpp).

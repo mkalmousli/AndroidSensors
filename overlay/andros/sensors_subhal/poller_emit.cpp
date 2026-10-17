@@ -12,7 +12,7 @@ Event FlushComplete(int32_t handle) {
     Event ev{};
     ev.sensorType = SensorType::META_DATA;
     ev.u.meta.what = V1_0::MetaDataEventType::META_DATA_FLUSH_COMPLETE;
-    ev.u.meta.sensor = handle;
+    ev.sensorHandle = handle;
     return ev;
 }
 
