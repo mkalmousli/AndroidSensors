@@ -44,9 +44,12 @@ int main() {
     std::lock_guard<std::mutex> l(mu);
     int accel_n = 0, light_n = 0, flushes = 0;
     for (const Event& e : got) {
+        if (e.sensorType == android::hardware::sensors::V2_1::SensorType::META_DATA) {
+            ++flushes;  // flush-complete carries the flushed sensor's handle
+            continue;
+        }
         if (e.sensorHandle == accel) { ++accel_n; CHECK(e.u.data[1] == 2.0f); }
         if (e.sensorHandle == light) ++light_n;
-        if (e.sensorType == android::hardware::sensors::V2_1::SensorType::META_DATA) ++flushes;
     }
     CHECK(accel_n >= 5);
     CHECK(light_n == 1);  // on-change: once at activation, value never changed
