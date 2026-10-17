@@ -9,7 +9,7 @@ ZONE=${ZONE:-us-central1-a}
 MACHINE=${MACHINE:-n2-highmem-8}       # 8 vCPU / 64 GB; use n2-standard-32 if quota allows
 DISK_GB=${DISK_GB:-500}
 REPO=${REPO:-mkalmousli/AndroidSensors}
-REPO_BRANCH=${REPO_BRANCH:-ccr-0a28e22a-43vywr}
+REPO_BRANCH=${REPO_BRANCH:-main}
 SECRET=asp-github-token
 NAME=asp-build-$(date +%Y%m%d-%H%M%S)
 
