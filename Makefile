@@ -15,7 +15,7 @@ help:
 build:
 	docker compose --profile build run --rm builder asp all
 cloud:
-	bash cloud/gcp_build.sh
+	uv run asp cloud build
 run:
 	docker compose up android
 verify:

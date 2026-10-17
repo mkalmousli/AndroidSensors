@@ -3,6 +3,7 @@ import argparse
 import sys
 from pathlib import Path
 
+from .cloud import cli as cloud_cli
 from .config import Config
 from .render import render_all
 from .steps.build import build
@@ -29,10 +30,13 @@ def main(argv: list[str] | None = None) -> int:
     sub.add_parser("release", help="sync, patch, build, package and publish a GitHub Release")
     r = sub.add_parser("render", help="render generated files only (no AOSP needed)")
     r.add_argument("--out", type=Path, default=Path("build/gen"))
+    cloud_cli.register(sub)
     args = p.parse_args(argv)
     cfg = Config()
 
-    if args.cmd == "render":
+    if args.cmd == "cloud":
+        cloud_cli.run(args)
+    elif args.cmd == "render":
         render_all(args.out)
     elif args.cmd == "build":
         build(cfg, args.quick)

@@ -32,16 +32,20 @@ adb shell dumpsys sensorservice | grep -i andros
 ```
 
 ## Build in the cloud and publish to GitHub (Google Cloud trial credit)
-In [Cloud Shell](https://shell.cloud.google.com), with a fine-grained GitHub token
-(*Contents: read and write* on this repo):
+Uses the `gcloud` and `gh` already logged in on your machine (`gcloud auth login`,
+`gcloud config set project <id>`, `gh auth login`); no token to create by hand.
 ```sh
 git clone https://github.com/mkalmousli/AndroidSensors && cd AndroidSensors
-GITHUB_TOKEN=github_pat_xxx bash cloud/gcp_build.sh      # or: MACHINE=n2-standard-32 ...
+uv run asp cloud build          # enables APIs, stores your gh token in Secret Manager, starts the VM
+uv run asp cloud logs           # follow the build   (also: asp cloud status)
+uv run asp cloud fetch          # later: download + rejoin the built emulator image
+uv run asp cloud cleanup        # delete any leftover build VM
 ```
-It creates a VM, builds with `asp release`, uploads the emulator image as a GitHub **pre-release**
-(split into <2 GB parts + `SHA256SUMS`; rejoin with `cat sdk-repo-*.zip.* > images.zip`) and then
-**deletes the VM**. On failure it uploads the build log instead. A 14 h cap deletes a stuck VM.
-Defaults: `n2-highmem-8` (fits trial CPU quota, ~6-8 h, a few dollars), 500 GB disk.
+The VM builds with `asp release`, uploads the emulator image as a GitHub **pre-release** (split into
+<2 GB parts + `SHA256SUMS`) and then **deletes itself**. On failure it uploads the build log instead
+(`failed-*` release). A 14 h cap deletes a stuck VM. Options: `--machine n2-standard-32`, `--zone`,
+`--disk-gb`, `--ref`, `--aosp-branch`. Default `n2-highmem-8` fits the trial CPU quota (~6-8 h, a few
+dollars). If `--max-run-duration` is rejected by your gcloud, update gcloud.
 
 ## What gets patched
 `asp patch` installs `overlay/andros` as `vendor/andros` in the AOSP tree and defines the product
