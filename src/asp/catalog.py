@@ -1,11 +1,8 @@
-"""Load and validate the declarative sensor catalog."""
-from dataclasses import dataclass, field
+"""Sensor model and validation; the data itself lives in sensors.py."""
+from dataclasses import dataclass, field, replace
 from pathlib import Path
 
-import yaml
-
 ROOT = Path(__file__).resolve().parents[2]
-CATALOG_FILE = ROOT / "catalog" / "sensors.yaml"
 HALS = ("sensors", "gnss", "health")
 MODES = ("continuous", "onchange", "special")
 MAX_VALUES = 6
@@ -43,12 +40,13 @@ def _validate(s: Sensor) -> None:
         raise ValueError(f"{s.name}: sensors HAL entries need an Android type id")
 
 
-def load(path: Path = CATALOG_FILE) -> list[Sensor]:
-    raw = yaml.safe_load(path.read_text())["sensors"]
-    sensors = [Sensor(index=i, **entry) for i, entry in enumerate(raw)]
-    names = [s.name for s in sensors]
-    if len(set(names)) != len(names):
+def load(sensors: list[Sensor] | None = None) -> list[Sensor]:
+    """Return the validated catalog (index = position in the list)."""
+    if sensors is None:
+        from .sensors import SENSORS as sensors
+    result = [replace(s, index=i) for i, s in enumerate(sensors)]
+    if len({s.name for s in result}) != len(result):
         raise ValueError("duplicate sensor names in catalog")
-    for s in sensors:
+    for s in result:
         _validate(s)
-    return sensors
+    return result

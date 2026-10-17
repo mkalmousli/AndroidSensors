@@ -3,7 +3,9 @@ name = "androidsensors"
 version = "0.1.0"
 description = "Patch AOSP so sensors are real system HALs exposed as a GraphQL API"
 requires-python = ">=3.11"
-dependencies = ["jinja2>=3.1", "pyyaml>=6.0"]
+license = "GPL-3.0-or-later"
+license-files = ["LICENSE"]
+dependencies = ["jinja2>=3.1"]
 
 [project.scripts]
 asp = "asp.cli:main"

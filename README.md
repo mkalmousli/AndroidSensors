@@ -74,21 +74,28 @@ docker run --rm -e ASP_GITHUB_TOKEN=<token with repo scope> -e ASP_REPO=<owner>/
   -v aosp:/aosp -v ccache:/ccache androidsensors asp release
 ```
 
-## What gets patched
-`asp patch` installs `overlay/andros` as `vendor/andros` in the AOSP tree and defines the product
-`andros_x86_64` (inherits `sdk_phone64_x86_64`). **No stock source file is edited.**
+## How it works
+`asp patch` copies [`overlay/andros`](overlay/andros/README.md) into the AOSP tree as `vendor/andros` and
+defines the product `andros_x86_64`. **No stock source file is edited.**
 
-| Piece | Where | Role |
-|---|---|---|
-| `store/` | static lib | shared-memory sample store, one writer, seqlock readers |
-| `graphqld/` | vendor init service | GraphQL (HTTP + SSE), generated from the catalog |
-| `sensors_subhal/` | multihal sub-HAL (`hals.conf`) | all motion/environment sensors → `SensorService` |
-| `gnss/` | `IGnss/default` | `location` → framework GPS provider |
-| `health/` | `IHealth/default` | `battery` → `BatteryService` |
-| `sepolicy/`, `gen/` | policy, feature XMLs | `android.hardware.sensor.*` features, SELinux |
+```
+graphqld ──writes──▶ /data/vendor/andros/sensors.store ◀──reads── sensors / GNSS / health HALs
+   ▲ HTTP :8000                                                              │
+GraphQL clients                                          SensorManager, LocationManager, BatteryManager
+```
+
+| Folder | Role |
+|---|---|
+| [`overlay/andros/store`](overlay/andros/store/README.md) | shared-memory sample store, one writer, seqlock readers |
+| [`overlay/andros/graphqld`](overlay/andros/graphqld/README.md) | GraphQL daemon (HTTP + SSE) |
+| [`overlay/andros/sensors_subhal`](overlay/andros/sensors_subhal/README.md) | all motion/environment sensors → `SensorService` |
+| [`overlay/andros/gnss`](overlay/andros/gnss/README.md) | `location` → framework GPS provider |
+| [`overlay/andros/health`](overlay/andros/health/README.md) | `battery` → `BatteryService` |
+| [`overlay/andros/sepolicy`](overlay/andros/sepolicy/README.md) | SELinux policy |
+| [`src/asp`](src/asp/README.md) | the `asp` pipeline (sync, patch, build, run, verify, cloud) |
 
 ## Add or change a sensor
-Edit `catalog/sensors.yaml` (name, Android type id, fields, range, rate…). The C++ table, GraphQL
+Edit the list in `src/asp/sensors.py` (name, Android type id, fields, range, rate…). The C++ table, GraphQL
 fields (`<name>`, `set<Name>`), HAL registration and feature flags are all generated. `make quick`
 rebuilds only our modules.
 
@@ -102,5 +109,8 @@ Verified here: catalog rendering, patch step, GraphQL engine, store, poller (hos
 (`sensors_subhal`, `gnss`, `health`), Soong module dependency names, SELinux rules and the
 `ASP_REMOVE_PACKAGES` list for the pinned tag (`android-14.0.0_r1`, override with `ASP_BRANCH`).
 Expect a few iterations on the first build; `asp doctor` lists the stock modules to replace.
+
+## License
+GPL-3.0-or-later, see [LICENSE](LICENSE).
 
 [uv]: https://docs.astral.sh/uv/

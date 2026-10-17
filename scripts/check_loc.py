@@ -3,7 +3,7 @@ import sys
 from pathlib import Path
 
 LIMIT = 100
-SUFFIXES = {".py", ".cpp", ".h", ".bp", ".mk", ".rc", ".j2", ".yaml", ".yml", ".xml", ".sh", ".conf"}
+SUFFIXES = {".py", ".cpp", ".h", ".bp", ".mk", ".rc", ".j2", ".yaml", ".yml", ".toml", ".xml", ".sh", ".conf"}
 SKIP = {".venv", ".git", "build", "__pycache__", ".ruff_cache", ".pytest_cache", "uv.lock"}
 
 
