@@ -20,9 +20,9 @@ class Device:
     device: str = "andros_x86_64"     # Build.DEVICE codename (set per partition, not PRODUCT_DEVICE)
     board: str = "andros"             # Build.BOARD
     # --- build strings ---
-    fingerprint: str = "andros/andros_x86_64/andros_x86_64:14/UP1A.231005.007/andros1:userdebug/test-keys"  # Build.FINGERPRINT
-    description: str = "andros_x86_64-userdebug 14 UP1A.231005.007 andros1 test-keys"  # ro.build.description
-    display_id: str = "Andros 1.0 (UP1A.231005.007)"  # Build.DISPLAY
+    fingerprint: str = ""             # Build.FINGERPRINT
+    description: str = ""             # ro.build.description
+    display_id: str = ""              # Build.DISPLAY
     # --- region ---
     locale: str = "en-US"             # default system locale (BCP-47)
     timezone: str = "UTC"             # persist.sys.timezone
