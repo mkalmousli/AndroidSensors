@@ -23,6 +23,7 @@ struct SensorDef {
     int32_t min_delay_us;
     double init[kMaxValues];
     bool wakeup;
+    const char* type_string;
 };
 
 constexpr int kSensorCount = {{ sensors | length }};
@@ -32,7 +33,7 @@ constexpr SensorDef kSensors[kSensorCount] = {
     {"{{ s.name }}", Hal::k{{ s.hal | capitalize }}, {{ s.type }}, Mode::k{{ {'continuous': 'Continuous', 'onchange': 'OnChange', 'special': 'Special', 'oneshot': 'OneShot'}[s.mode] }}, {{ s.fields | length }},
      { {% for f in s.fields %}"{{ f }}"{{ ", " if not loop.last }}{% endfor %} },
      "{{ s.unit }}", {{ s.max_range | float }}f, {{ s.resolution | float }}f, {{ s.power | float }}f, {{ s.min_delay_us }},
-     { {% for v in s.init %}{{ v }}{{ ", " if not loop.last }}{% endfor %} }, {{ 'true' if s.wakeup else 'false' }}},
+     { {% for v in s.init %}{{ v }}{{ ", " if not loop.last }}{% endfor %} }, {{ 'true' if s.wakeup else 'false' }}, "{{ s.type_string }}"},
 {% endfor %}
 };
 

@@ -36,3 +36,10 @@ def test_triggers_and_wakeups():
     by = {s.name: s for s in load()}
     assert by["proximity"].wakeup and by["significantMotion"].mode == "oneshot"
     assert by["stepDetector"].mode == "special" and len(by["pose6dof"].fields) == 15
+
+
+def test_private_sensors_have_type_strings():
+    from asp.catalog import load
+    private = [s for s in load() if s.type >= 0x10000]
+    assert {s.name for s in private} == {"activity", "floors"}
+    assert all(s.type_string.startswith("android.sensor.") for s in private)

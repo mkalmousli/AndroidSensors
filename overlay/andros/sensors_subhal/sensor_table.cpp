@@ -39,7 +39,7 @@ SensorInfo MakeInfo(int32_t handle) {
     info.vendor = gen::kSensorVendor;
     info.version = 1;
     info.type = static_cast<SensorType>(def.type);
-    info.typeAsString = "";
+    info.typeAsString = def.type_string;
     info.maxRange = def.max_range;
     info.resolution = def.resolution;
     info.power = def.power;

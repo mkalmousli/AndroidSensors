@@ -29,7 +29,7 @@ Store* Store::Open(const char* path, bool writer) {
     close(fd);
     if (map == MAP_FAILED) return nullptr;
     auto* store = new Store(static_cast<Header*>(map), writer);
-    if (writer && store->hdr_->magic != kMagic) {
+    if (writer && (store->hdr_->magic != kMagic || store->hdr_->count != kSensorCount)) {
         for (int i = 0; i < kSensorCount; ++i) store->Write(i, kSensors[i].init, kSensors[i].n);
         store->hdr_->count = kSensorCount;
         store->hdr_->magic = kMagic;

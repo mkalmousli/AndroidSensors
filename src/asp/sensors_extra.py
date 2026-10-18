@@ -4,6 +4,7 @@ Uncalibrated sensors carry x, y, z plus three bias values. Detectors and gesture
 `mutation { triggerStepDetector { ok } }` fires one event ("oneshot" sensors disable after firing).
 """
 from .catalog import Sensor
+from .sensors_private import PRIVATE
 
 
 def _uncal(name, type_, unit, rng, res, init):
@@ -57,4 +58,4 @@ EXTRA = [
            fields=["qx", "qy", "qz", "qw", "tx", "ty", "tz", "dqx", "dqy", "dqz", "dqw", "dtx",
                    "dty", "dtz", "seq"], max_range=1, resolution=1e-05, power=0.5,
            min_delay_us=10000, init=[0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0]),
-]
+] + PRIVATE

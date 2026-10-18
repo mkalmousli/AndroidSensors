@@ -23,6 +23,7 @@ class Sensor:
     min_delay_us: int = 0
     feature: str = ""
     wakeup: bool = False
+    type_string: str = ""  # required for vendor-private types (>= 0x10000)
     index: int = field(default=0, compare=False)
 
     @property
@@ -39,6 +40,8 @@ def _validate(s: Sensor) -> None:
         raise ValueError(f"{s.name}: fields/init must match and be 1..{MAX_VALUES}")
     if s.hal == "sensors" and s.type <= 0:
         raise ValueError(f"{s.name}: sensors HAL entries need an Android type id")
+    if s.type >= 0x10000 and not s.type_string:
+        raise ValueError(f"{s.name}: private sensor types need a type_string")
 
 
 def load(sensors: list[Sensor] | None = None) -> list[Sensor]:
