@@ -7,7 +7,6 @@ from asp.steps.patch import patch
 @pytest.fixture
 def cfg(tmp_path, monkeypatch):
     monkeypatch.setenv("ASP_WORKDIR", str(tmp_path))
-    monkeypatch.setenv("ASP_REMOVE_PACKAGES", "stock.a stock.b")
     (tmp_path / "build").mkdir()
     (tmp_path / "build" / "envsetup.sh").write_text("")
     return Config()
@@ -25,7 +24,7 @@ def test_patch_installs_overlay_and_product(cfg):
     assert (v / "graphqld" / "Android.bp").exists()
     assert (v / "gen" / "catalog_gen.h").exists()
     product = (v / "andros_x86_64.mk").read_text()
-    assert "filter-out stock.a stock.b" in product and "@REMOVE" not in product
+    assert "inherit-product" in product and "@REMOVE" not in product
 
 
 def test_patch_is_idempotent(cfg):

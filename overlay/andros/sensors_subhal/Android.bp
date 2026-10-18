@@ -2,6 +2,7 @@
 cc_library_shared {
     name: "andros_sensors_subhal",
     stem: "sensors.andros",
+    overrides: ["android.hardware.sensors@2.1-impl.ranchu"],
     vendor: true,
     relative_install_path: "hw",
     srcs: ["*.cpp"],

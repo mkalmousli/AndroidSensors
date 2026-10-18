@@ -1,6 +1,7 @@
 cc_binary {
     name: "andros_health",
     stem: "android.hardware.health-service.andros",
+    overrides: ["android.hardware.health-service.example"],
     defaults: ["libhealth_aidl_common_defaults"],
     vendor: true,
     relative_install_path: "hw",

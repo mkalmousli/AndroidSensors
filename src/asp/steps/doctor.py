@@ -1,4 +1,4 @@
-"""List stock packages in the AOSP tree that our HALs replace (to tune ASP_REMOVE_PACKAGES)."""
+"""List stock packages in the AOSP tree that our HALs replace (the ones our modules `overrides:`)."""
 import re
 
 from ..config import Config
@@ -12,4 +12,3 @@ def doctor(cfg: Config) -> None:
                   cwd=cfg.workdir)
     names = sorted({m.group(1) for line in out.splitlines() if (m := PATTERN.search(line))})
     print("Candidate stock modules:\n  " + "\n  ".join(names))
-    print("Current removals:", " ".join(cfg.remove_packages))

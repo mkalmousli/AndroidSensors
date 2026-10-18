@@ -19,16 +19,9 @@ def _copy_overlay(cfg: Config) -> None:
     shutil.copytree(OVERLAY, cfg.vendor_dir)
 
 
-def _write_product(cfg: Config) -> None:
-    template = (OVERLAY / "andros_x86_64.mk").read_text()
-    removals = " ".join(cfg.remove_packages)
-    (cfg.vendor_dir / "andros_x86_64.mk").write_text(template.replace("@REMOVE_PACKAGES@", removals))
-
-
 def patch(cfg: Config) -> None:
     if not (cfg.workdir / "build" / "envsetup.sh").exists():
         raise SystemExit(f"No AOSP tree in {cfg.workdir}; run `asp sync` first.")
     _copy_overlay(cfg)
     render_all(cfg.vendor_dir / "gen", load())
-    _write_product(cfg)
     print(f"Patched {cfg.workdir}: vendor/andros installed, product {cfg.lunch} ready.")

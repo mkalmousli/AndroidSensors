@@ -107,7 +107,7 @@ rebuilds only our modules.
 Verified here: catalog rendering, patch step, GraphQL engine, store, poller (host unit tests).
 **Not yet verified on a real AOSP build** (needs KVM + hours): the HIDL/AIDL HAL glue
 (`sensors_subhal`, `gnss`, `health`), Soong module dependency names, SELinux rules and the
-`ASP_REMOVE_PACKAGES` list for the pinned tag (`android-14.0.0_r1`, override with `ASP_BRANCH`).
+stock-module `overrides:` for the pinned tag (`android-14.0.0_r1`, override with `ASP_BRANCH`).
 Expect a few iterations on the first build; `asp doctor` lists the stock modules to replace.
 
 ## License
