@@ -23,15 +23,31 @@ awk '{print $2}' SHA256SUMS | xargs -I{} curl -LO $U/{}
 sha256sum -c SHA256SUMS
 ```
 
-**Join** the parts and unpack them into your SDK:
+**Join** the parts and unpack them into your SDK (needs ~9 GB free; delete `andros.zip` afterwards):
 ```sh
 cat sdk-repo-*.zip.* > andros.zip
 unzip andros.zip -d $ANDROID_HOME/system-images/android-34/andros
 ```
 
-**Create and start** the virtual device:
+**Create and start** the virtual device. `avdmanager` can't see a hand-unpacked image, so write the
+two small AVD files yourself:
 ```sh
-avdmanager create avd -n andros -k "system-images;android-34;andros;x86_64"
+mkdir -p ~/.android/avd/andros.avd
+printf 'path=%s\ntarget=android-34\n' ~/.android/avd/andros.avd > ~/.android/avd/andros.ini
+cat > ~/.android/avd/andros.avd/config.ini <<EOF
+AvdId=andros
+abi.type=x86_64
+hw.cpu.arch=x86_64
+hw.ramSize=4096
+hw.lcd.width=1080
+hw.lcd.height=2400
+hw.lcd.density=420
+hw.gpu.enabled=yes
+hw.gpu.mode=auto
+disk.dataPartition.size=6G
+image.sysdir.1=system-images/android-34/andros/x86_64/
+tag.id=default
+EOF
 emulator -avd andros
 ```
 
