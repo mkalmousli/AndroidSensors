@@ -6,7 +6,12 @@ PRODUCT_MODEL := {{ d.model }}
 PRODUCT_PROPERTY_OVERRIDES += ro.product.marketname={{ d.marketing_name }}
 {% endif %}
 {% if d.device %}
-PRODUCT_DEVICE := {{ d.device }}
+# The product device name picks the board config directory, so set per-partition names instead.
+PRODUCT_SYSTEM_DEVICE := {{ d.device }}
+PRODUCT_SYSTEM_EXT_DEVICE := {{ d.device }}
+PRODUCT_PRODUCT_DEVICE := {{ d.device }}
+PRODUCT_VENDOR_DEVICE := {{ d.device }}
+PRODUCT_ODM_DEVICE := {{ d.device }}
 {% endif %}
 {% if d.board %}
 TARGET_BOOTLOADER_BOARD_NAME := {{ d.board }}

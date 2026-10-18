@@ -28,6 +28,15 @@ def test_device_profile_is_rendered(tmp_path):
     render_all(tmp_path, device=d)
     mk = (tmp_path / "device.mk").read_text()
     assert "PRODUCT_BRAND := Acme" in mk and "BUILD_FINGERPRINT=acme/z1" in mk and "ro.foo=bar" in mk
-    assert "PRODUCT_DEVICE" not in mk  # empty fields keep the AOSP default
+    assert "_DEVICE" not in mk  # empty fields keep the AOSP default
     h = (tmp_path / "device_gen.h").read_text()
     assert '"Acme Sensors"' in h and "kBatteryMah = 5000" in h
+
+
+def test_device_codename_never_sets_product_device(tmp_path):
+    from asp.device import Device
+    from asp.render import render_all
+
+    render_all(tmp_path, device=Device(device="x1"))
+    mk = (tmp_path / "device.mk").read_text()
+    assert "\nPRODUCT_DEVICE" not in mk and "PRODUCT_SYSTEM_DEVICE := x1" in mk
