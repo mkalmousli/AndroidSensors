@@ -23,7 +23,7 @@ def test_device_profile_is_rendered(tmp_path):
     from asp.device import Device
     from asp.render import render_all
 
-    d = Device(brand="Acme", model="Z1", fingerprint="acme/z1/z1:14/X/1:user/release-keys",
+    d = Device(brand="Acme", model="Z1", device="", board="", fingerprint="acme/z1/z1:14/X/1:user/release-keys",
                sensor_vendor="Acme Sensors", battery_mah=5000, properties=(("ro.foo", "bar"),))
     render_all(tmp_path, device=d)
     mk = (tmp_path / "device.mk").read_text()
