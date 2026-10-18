@@ -20,3 +20,19 @@ def test_invalid_entries_rejected():
         _validate(bad)
     with pytest.raises(ValueError):
         _validate(Sensor(name="x", hal="nope", fields=["a"], init=[0]))
+
+
+def test_every_standard_sensor_type_is_covered():
+    from asp.catalog import load
+
+    types = {s.type for s in load() if s.hal == "sensors"}
+    # 1..31, 34..36 minus the two meta types (32 dynamic meta, 33 additional info)
+    assert set(range(1, 32)) | {34, 35, 36} <= types
+
+
+def test_triggers_and_wakeups():
+    from asp.catalog import load
+
+    by = {s.name: s for s in load()}
+    assert by["proximity"].wakeup and by["significantMotion"].mode == "oneshot"
+    assert by["stepDetector"].mode == "special" and len(by["pose6dof"].fields) == 15

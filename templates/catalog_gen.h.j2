@@ -5,7 +5,9 @@
 namespace andros {
 
 enum class Hal { kSensors, kGnss, kHealth };
-enum class Mode { kContinuous, kOnChange, kSpecial };
+enum class Mode { kContinuous, kOnChange, kSpecial, kOneShot };
+
+constexpr int kMaxValues = {{ max_values }};
 
 struct SensorDef {
     const char* name;
@@ -13,23 +15,24 @@ struct SensorDef {
     int32_t type;
     Mode mode;
     int n;
-    const char* fields[6];
+    const char* fields[kMaxValues];
     const char* unit;
     float max_range;
     float resolution;
     float power;
     int32_t min_delay_us;
-    double init[6];
+    double init[kMaxValues];
+    bool wakeup;
 };
 
 constexpr int kSensorCount = {{ sensors | length }};
 
 constexpr SensorDef kSensors[kSensorCount] = {
 {% for s in sensors %}
-    {"{{ s.name }}", Hal::k{{ s.hal | capitalize }}, {{ s.type }}, Mode::k{{ {'continuous': 'Continuous', 'onchange': 'OnChange', 'special': 'Special'}[s.mode] }}, {{ s.fields | length }},
+    {"{{ s.name }}", Hal::k{{ s.hal | capitalize }}, {{ s.type }}, Mode::k{{ {'continuous': 'Continuous', 'onchange': 'OnChange', 'special': 'Special', 'oneshot': 'OneShot'}[s.mode] }}, {{ s.fields | length }},
      { {% for f in s.fields %}"{{ f }}"{{ ", " if not loop.last }}{% endfor %} },
      "{{ s.unit }}", {{ s.max_range | float }}f, {{ s.resolution | float }}f, {{ s.power | float }}f, {{ s.min_delay_us }},
-     { {% for v in s.init %}{{ v }}{{ ", " if not loop.last }}{% endfor %} }},
+     { {% for v in s.init %}{{ v }}{{ ", " if not loop.last }}{% endfor %} }, {{ 'true' if s.wakeup else 'false' }}},
 {% endfor %}
 };
 

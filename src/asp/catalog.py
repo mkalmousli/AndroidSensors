@@ -4,8 +4,8 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
 HALS = ("sensors", "gnss", "health")
-MODES = ("continuous", "onchange", "special")
-MAX_VALUES = 6
+MODES = ("continuous", "onchange", "special", "oneshot")
+MAX_VALUES = 15  # pose6dof is the widest
 
 
 @dataclass(frozen=True)
@@ -22,6 +22,7 @@ class Sensor:
     power: float = 0.0
     min_delay_us: int = 0
     feature: str = ""
+    wakeup: bool = False
     index: int = field(default=0, compare=False)
 
     @property

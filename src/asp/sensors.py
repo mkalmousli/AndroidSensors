@@ -2,11 +2,12 @@
 
 hal:    "sensors" | "gnss" | "health"   which system HAL serves it
 type:   Android SENSOR_TYPE_* id (sensors HAL only)
-mode:   "continuous" | "onchange" | "special"
-fields: GraphQL field names, one per value (max 6); init gives their start values
+mode:   "continuous" | "onchange" | "special" | "oneshot"   (last two are triggers)
+fields: GraphQL field names, one per value (max 15); init gives their start values
 feature: android.hardware.sensor.<feature> declared in the image, if any
 """
 from .catalog import Sensor
+from .sensors_extra import EXTRA
 
 SENSORS = [
     Sensor(
@@ -40,7 +41,7 @@ SENSORS = [
     ),
     Sensor(
         name="proximity", hal="sensors", type=8, mode="onchange", fields=["cm"], unit="cm",
-        max_range=5, resolution=5, power=0.1, min_delay_us=0, init=[5], feature="proximity"
+        max_range=5, resolution=5, power=0.1, min_delay_us=0, init=[5], feature="proximity", wakeup=True
     ),
     Sensor(
         name="gravity", hal="sensors", type=9, mode="continuous", fields=["x", "y", "z"],
@@ -85,4 +86,4 @@ SENSORS = [
         name="battery", hal="health", fields=["level", "charging", "temperature", "voltage", "ac"],
         unit="%/C/mV", init=[100, 0, 25, 4200, 0]
     ),
-]
+] + EXTRA

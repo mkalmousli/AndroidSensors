@@ -118,6 +118,9 @@ Edit the list in `src/asp/sensors.py` (name, Android type id, fields, range, rat
 fields (`<name>`, `set<Name>`), HAL registration and feature flags are all generated. `make quick`
 rebuilds only our modules.
 
+All standard Android sensor types are covered (35 sensors plus location and battery). Detectors and
+gestures are triggers: `mutation { triggerSignificantMotion { ok } }`.
+
 The device identity (brand, model, fingerprint, locale, timezone, battery size, vendor strings, extra
 properties) is one dataclass in `src/asp/device.py` with dummy defaults. Put yours in git-ignored `src/asp/device_local.py` (copy `device_local.py.example`), run `asp patch`, rebuild.
 

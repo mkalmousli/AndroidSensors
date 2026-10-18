@@ -3,7 +3,7 @@ from pathlib import Path
 
 from jinja2 import Environment, FileSystemLoader, StrictUndefined
 
-from .catalog import ROOT, Sensor, load
+from .catalog import MAX_VALUES, ROOT, Sensor, load
 from .device import DEVICE, Device
 
 TEMPLATES = ROOT / "templates"
@@ -31,7 +31,7 @@ def render_all(out: Path, sensors: list[Sensor] | None = None, device: Device = 
     written = []
 
     header = out / "catalog_gen.h"
-    header.write_text(env.get_template("catalog_gen.h.j2").render(sensors=sensors))
+    header.write_text(env.get_template("catalog_gen.h.j2").render(sensors=sensors, max_values=MAX_VALUES))
     written.append(header)
 
     features = feature_names(sensors)

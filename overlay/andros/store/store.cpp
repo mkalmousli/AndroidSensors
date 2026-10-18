@@ -48,7 +48,7 @@ bool Store::Read(int idx, Sample* out) const {
         uint32_t before = s.seq.load(std::memory_order_acquire);
         if (before & 1) continue;
         out->ts_ns = s.ts_ns;
-        for (int i = 0; i < 6; ++i) out->v[i] = s.v[i];
+        for (int i = 0; i < kMaxValues; ++i) out->v[i] = s.v[i];
         std::atomic_thread_fence(std::memory_order_acquire);
         if (before == s.seq.load(std::memory_order_relaxed)) return true;
     }
@@ -62,7 +62,7 @@ void Store::Write(int idx, const double* values, int n) {
     s.seq.store(seq + 1, std::memory_order_release);
     std::atomic_thread_fence(std::memory_order_release);
     s.ts_ns = NowNs();
-    for (int i = 0; i < n && i < 6; ++i) s.v[i] = values[i];
+    for (int i = 0; i < n && i < kMaxValues; ++i) s.v[i] = values[i];
     s.seq.store(seq + 2, std::memory_order_release);
     hdr_->generation.fetch_add(1, std::memory_order_release);
 }

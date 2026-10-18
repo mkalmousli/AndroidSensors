@@ -17,7 +17,7 @@ struct SensorInfo {
 };
 struct Event {
     int64_t timestamp; int32_t sensorHandle; SensorType sensorType;
-    union { float data[16]; struct { V1_0::MetaDataEventType what; } meta; } u;
+    union { float data[16]; uint64_t stepCount; struct { V1_0::MetaDataEventType what; } meta; } u;
 };
 }  // namespace V2_1
 }  // namespace android::hardware::sensors

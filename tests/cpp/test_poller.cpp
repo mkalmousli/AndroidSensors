@@ -41,7 +41,35 @@ int main() {
     std::this_thread::sleep_for(std::chrono::milliseconds(120));
     poller.Flush(accel);
     std::this_thread::sleep_for(std::chrono::milliseconds(60));
+    int sigmo = -1, steps = -1;
+    for (size_t h = 1; h <= HalSensors().size(); ++h) {
+        std::string n = kSensors[HandleToIndex(int32_t(h))].name;
+        if (n == "significantMotion") sigmo = int(h);
+        if (n == "stepCounter") steps = int(h);
+    }
+    double zero[1] = {0};
+    store->Write(HandleToIndex(sigmo), zero, 1);  // the store file persists between runs
+    store->Write(HandleToIndex(steps), zero, 1);
+    poller.Activate(sigmo, true);
+    poller.Activate(steps, true);
+    std::this_thread::sleep_for(std::chrono::milliseconds(80));
+    double one[1] = {1}, step[1] = {42};
+    store->Write(HandleToIndex(sigmo), one, 1);  // trigger fires on the counter change
+    store->Write(HandleToIndex(steps), step, 1);
+    std::this_thread::sleep_for(std::chrono::milliseconds(120));
+    double two[1] = {2};
+    store->Write(HandleToIndex(sigmo), two, 1);  // one-shot: disabled after the first event
+    std::this_thread::sleep_for(std::chrono::milliseconds(120));
     std::lock_guard<std::mutex> l(mu);
+    int sig_n = 0, step_n = 0;
+    uint64_t last_step = 0;
+    for (const Event& e : got) {
+        if (e.sensorHandle == sigmo) { ++sig_n; CHECK(e.u.data[0] == 1.0f); }
+        if (e.sensorHandle == steps) { ++step_n; last_step = e.u.stepCount; }
+    }
+    CHECK(sig_n == 1);   // not at activation, once on trigger, never again
+    CHECK(last_step == 42);
+    CHECK(step_n == 2);  // on-change: once at activation (0 steps) and once for 42
     int accel_n = 0, light_n = 0, flushes = 0;
     for (const Event& e : got) {
         if (e.sensorType == android::hardware::sensors::V2_1::SensorType::META_DATA) {

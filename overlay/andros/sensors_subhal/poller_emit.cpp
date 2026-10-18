@@ -5,6 +5,8 @@
 
 namespace andros {
 
+constexpr int32_t kTypeStepCounter = 19;
+
 using ::android::hardware::sensors::V2_1::SensorType;
 namespace V1_0 = ::android::hardware::sensors::V1_0;
 
@@ -24,13 +26,26 @@ bool Poller::Emit(int32_t handle, State& st, std::vector<Event>* out) {
         for (int i = 0; i < def.n; ++i) sample.v[i] = def.init[i];
     }
     bool changed = !st.has_last || !std::equal(sample.v, sample.v + def.n, st.last.v);
-    if (def.mode == Mode::kOnChange && !changed) return false;
+    const bool trigger = def.mode == Mode::kOneShot || def.mode == Mode::kSpecial;
+    if (trigger && !st.has_last) {  // a trigger fires on a counter change, never on activation
+        st.last = sample;
+        st.has_last = true;
+        return false;
+    }
+    if ((def.mode == Mode::kOnChange || trigger) && !changed) return false;
     Event ev{};
     ev.timestamp = NowNs();
     ev.sensorHandle = handle;
     ev.sensorType = static_cast<SensorType>(def.type);
-    for (int i = 0; i < def.n; ++i) ev.u.data[i] = static_cast<float>(sample.v[i]);
+    if (trigger) {
+        ev.u.data[0] = 1.0f;  // scalar payload of detector / gesture events
+    } else if (def.type == kTypeStepCounter) {
+        ev.u.stepCount = static_cast<uint64_t>(sample.v[0]);  // uint64, not float
+    } else {
+        for (int i = 0; i < def.n; ++i) ev.u.data[i] = static_cast<float>(sample.v[i]);
+    }
     out->push_back(ev);
+    if (def.mode == Mode::kOneShot) st.on = false;  // one-shot sensors disable after firing
     st.last = sample;
     st.has_last = true;
     return true;

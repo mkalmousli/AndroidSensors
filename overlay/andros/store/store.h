@@ -8,18 +8,18 @@
 
 namespace andros {
 
-constexpr uint32_t kMagic = 0x41445253;  // "ADRS"
+constexpr uint32_t kMagic = 0x41445254;  // "ADRT" (bumped: slot size changed)
 constexpr const char* kDefaultPath = "/data/vendor/andros/sensors.store";
 
 struct Sample {
     int64_t ts_ns = 0;
-    double v[6] = {0, 0, 0, 0, 0, 0};
+    double v[kMaxValues] = {};
 };
 
 struct Slot {
     std::atomic<uint32_t> seq;  // odd while a write is in progress (seqlock)
     int64_t ts_ns;
-    double v[6];
+    double v[kMaxValues];
 };
 
 struct Header {
