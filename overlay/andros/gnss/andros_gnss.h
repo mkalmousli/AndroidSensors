@@ -26,10 +26,10 @@ class AndrosGnss : public gnss::BnGnss {
     ScopedAStatus injectLocation(const gnss::GnssLocation&) override { return ScopedAStatus::ok(); }
     ScopedAStatus injectBestLocation(const gnss::GnssLocation&) override { return ScopedAStatus::ok(); }
     ScopedAStatus deleteAidingData(GnssAidingData) override { return ScopedAStatus::ok(); }
-    ScopedAStatus startSvStatus() override { return ScopedAStatus::ok(); }
-    ScopedAStatus stopSvStatus() override { return ScopedAStatus::ok(); }
-    ScopedAStatus startNmea() override { return ScopedAStatus::ok(); }
-    ScopedAStatus stopNmea() override { return ScopedAStatus::ok(); }
+    ScopedAStatus startSvStatus() override { sv_ = true; return ScopedAStatus::ok(); }
+    ScopedAStatus stopSvStatus() override { sv_ = false; return ScopedAStatus::ok(); }
+    ScopedAStatus startNmea() override { nmea_ = true; return ScopedAStatus::ok(); }
+    ScopedAStatus stopNmea() override { nmea_ = false; return ScopedAStatus::ok(); }
     ScopedAStatus setPositionMode(const PositionModeOptions& o) override;
 
     // Optional extensions are reported as unavailable (see gnss_extensions.cpp).
@@ -51,11 +51,13 @@ class AndrosGnss : public gnss::BnGnss {
     void StopFixes();
     void FixLoop();
     gnss::GnssLocation CurrentFix();
+    void EmitStreams(gnss::IGnssCallback& cb, const gnss::GnssLocation& loc);
 
     std::mutex mu_;
     std::shared_ptr<gnss::IGnssCallback> cb_;
     std::thread thread_;
     std::atomic<bool> running_{false};
+    std::atomic<bool> nmea_{false}, sv_{false};
     int interval_ms_ = 1000;
     Store* store_ = nullptr;
 };

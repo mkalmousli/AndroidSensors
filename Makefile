@@ -3,7 +3,7 @@ GEN := build/gen
 CXXFLAGS := -std=c++17 -Wall -Wextra -I$(GEN) -Ioverlay/andros/store -Ioverlay/andros/graphqld
 CORE := overlay/andros/store/store.cpp $(filter-out %/main.cpp,$(wildcard overlay/andros/graphqld/*.cpp))
 
-.PHONY: cloud test-poller help build run verify shell quick test test-cpp gen lint clean
+.PHONY: cloud test-nmea test-poller help build run verify shell quick test test-cpp gen lint clean
 
 help:
 	@echo "make build   - sync + patch + build the Android image in Docker (hours, first time)"
@@ -35,7 +35,11 @@ test-poller: gen
 	g++ $(CXXFLAGS) -Itests/cpp/stubs -I$(HAL) tests/cpp/test_poller.cpp $(HAL)/poller.cpp $(HAL)/poller_emit.cpp \
 		$(HAL)/sensor_table.cpp overlay/andros/store/store.cpp -o build/test_poller -pthread
 	ANDROS_STORE=build/poller.store build/test_poller
-test: test-cpp test-poller lint
+GNSS := overlay/andros/gnss
+test-nmea:
+	g++ $(CXXFLAGS) -I$(GNSS) tests/cpp/test_nmea.cpp $(GNSS)/nmea.cpp $(GNSS)/sats.cpp -o build/test_nmea
+	build/test_nmea
+test: test-cpp test-poller test-nmea lint
 	uv run pytest -q
 lint:
 	uv run ruff check .

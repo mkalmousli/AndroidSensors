@@ -78,7 +78,11 @@ void AndrosGnss::FixLoop() {
     while (running_) {
         std::shared_ptr<gnss::IGnssCallback> cb;
         { std::lock_guard<std::mutex> lock(mu_); cb = cb_; }
-        if (cb) cb->gnssLocationCb(CurrentFix());
+        if (cb) {
+            GnssLocation loc = CurrentFix();
+            cb->gnssLocationCb(loc);
+            EmitStreams(*cb, loc);
+        }
         std::this_thread::sleep_for(std::chrono::milliseconds(interval_ms_));
     }
 }
