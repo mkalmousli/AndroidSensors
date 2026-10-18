@@ -25,7 +25,7 @@ PRODUCT_BUILD_PROP_OVERRIDES += PRIVATE_BUILD_DESC="{{ d.description }}"
 {% if d.display_id %}
 PRODUCT_BUILD_PROP_OVERRIDES += BUILD_DISPLAY_ID={{ d.display_id }}
 {% endif %}
-PRODUCT_LOCALES := {{ d.locale }}
+PRODUCT_LOCALES := {{ d.locale | replace("-", "_") }}  # aapt wants en_US, not en-US
 PRODUCT_DEFAULT_PROPERTY_OVERRIDES += persist.sys.timezone={{ d.timezone }}
 {% for key, value in d.properties %}
 PRODUCT_PROPERTY_OVERRIDES += {{ key }}={{ value }}

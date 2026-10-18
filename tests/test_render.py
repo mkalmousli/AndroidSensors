@@ -54,3 +54,9 @@ def test_every_device_field_is_rendered(tmp_path):
     out = (tmp_path / "device.mk").read_text() + (tmp_path / "device_gen.h").read_text()
     missing = [k for k, v in values.items() if k != "properties" and str(v) not in out]
     assert not missing and "v_prop" in out, f"ignored fields: {missing}"
+
+
+def test_locale_uses_underscore_for_aapt(tmp_path):
+    from asp.device import Device
+    render_all(tmp_path, device=Device(locale="de-DE"))
+    assert "PRODUCT_LOCALES := de_DE" in (tmp_path / "device.mk").read_text()
