@@ -17,8 +17,10 @@ Linux machine with KVM.
 **Download** the latest build. It comes in parts because GitHub limits files to 2 GB:
 ```sh
 mkdir andros && cd andros
-curl -s https://api.github.com/repos/mkalmousli/AndroidSensors/releases/latest \
-  | grep -o 'https://[^"]*releases/download[^"]*' | xargs -n1 curl -LO
+U=https://github.com/mkalmousli/AndroidSensors/releases/latest/download
+curl -sLO $U/SHA256SUMS
+awk '{print $2}' SHA256SUMS | xargs -I{} curl -LO $U/{}
+sha256sum -c SHA256SUMS
 ```
 
 **Join** the parts and unpack them into your SDK:
