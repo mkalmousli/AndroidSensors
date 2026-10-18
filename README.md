@@ -121,6 +121,11 @@ rebuilds only our modules.
 All standard Android sensor types are covered (35 sensors plus location and battery). Detectors and
 gestures are triggers: `mutation { triggerSignificantMotion { ok } }`.
 
+**Settings page:** `http://localhost:8000/settings` (after `adb forward tcp:8000 tcp:8000`) shows status and metrics, a live
+event stream, a searchable sensor table, and switches: data API on/off, each sensor on/off, and *dummy mode*
+(the sensor produces synthetic values by itself). The same controls are GraphQL: `status`, `sensors(search:)`,
+`setApiEnabled`, `setSensorEnabled`, `setSensorDummy`.
+
 The device identity (brand, model, fingerprint, locale, timezone, battery size, vendor strings, extra
 properties) is one dataclass in `src/asp/device.py` with dummy defaults. Put yours in git-ignored `src/asp/device_local.py` (copy `device_local.py.example`), run `asp patch`, rebuild.
 

@@ -8,6 +8,7 @@
 #include <cstdlib>
 #include <thread>
 
+#include "dummy.h"
 #include "handler.h"
 
 using namespace andros;
@@ -32,6 +33,7 @@ int main(int argc, char** argv) {
     const char* path = argc > 2 ? argv[2] : kDefaultPath;
     Store* store = Store::Open(path, /*writer=*/true);
     if (!store) { perror("graphqld: open store"); return 1; }
+    StartDummy(store);
     int server = Listen(port);
     if (server < 0) return 1;
     Resolvers resolvers(store);

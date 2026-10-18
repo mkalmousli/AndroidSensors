@@ -1,6 +1,7 @@
 #include "handler.h"
 
 #include "graphiql.h"
+#include "settings_html.h"
 
 namespace andros {
 
@@ -17,6 +18,8 @@ static Value ErrorBody(const std::string& message) {
 void Handle(int fd, const Request& req, const Resolvers& resolvers, Store* store) {
     if (req.method == "OPTIONS") return Respond(fd, 200, "text/plain", "");
     if (req.path == "/") return Respond(fd, 200, "text/html", kConsoleHtml);
+    if (req.path == "/settings") return Respond(fd, 200, "text/html", kSettingsHtml);
+    if (req.path == "/events") return StreamEvents(fd, req, resolvers, store);
     if (req.path == "/health") return Respond(fd, 200, "text/plain", "ok");
     if (req.path != "/graphql") return Respond(fd, 404, "text/plain", "not found");
 

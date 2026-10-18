@@ -30,6 +30,8 @@ gen:
 test-cpp: gen
 	g++ $(CXXFLAGS) tests/cpp/test_graphql.cpp $(CORE) -o build/test_graphql -pthread
 	build/test_graphql
+	g++ $(CXXFLAGS) tests/cpp/test_settings.cpp $(CORE) -o build/test_settings -pthread
+	build/test_settings
 HAL := overlay/andros/sensors_subhal
 test-poller: gen
 	g++ $(CXXFLAGS) -Itests/cpp/stubs -I$(HAL) tests/cpp/test_poller.cpp $(HAL)/poller.cpp $(HAL)/poller_emit.cpp \

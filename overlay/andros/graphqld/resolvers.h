@@ -18,6 +18,7 @@ class Resolvers {
   private:
     bool Query(const Field& field, Value* out, std::string* error) const;
     bool Mutate(const Field& field, Value* out, std::string* error) const;
+    bool Admin(const Operation& op, const Field& field, Value* out, std::string* error, bool* handled) const;
     bool Trigger(const Field& field, Value* out, std::string* error) const;  // trigger<Name>
     bool SetByName(const std::string& name, const Field& field, Value* out, std::string* error) const;
     Store* store_;

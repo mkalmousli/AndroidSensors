@@ -2,6 +2,7 @@
 
 #include <cstring>
 
+#include "metrics.h"
 #include "player.h"
 
 namespace andros {
@@ -21,6 +22,10 @@ Value Resolvers::Describe(int idx) const {
     obj.Set("name", Value::Str(def.name));
     obj.Set("unit", Value::Str(def.unit));
     obj.Set("ts", Value::Num(double(sample.ts_ns)));
+    obj.Set("hal", Value::Str(def.hal == Hal::kSensors ? "sensors" : def.hal == Hal::kGnss ? "gnss" : "health"));
+    obj.Set("enabled", Value::Bool(!(store_->Flags(idx) & kDisabled)));
+    obj.Set("dummy", Value::Bool(store_->Flags(idx) & kDummy));
+    obj.Set("writes", Value::Num(double(store_->Writes(idx))));
     Value values = Value::Arr();
     for (int i = 0; i < def.n; ++i) {
         values.Push(Value::Num(sample.v[i]));
@@ -33,16 +38,17 @@ Value Resolvers::Describe(int idx) const {
 bool Resolvers::operator()(const Operation& op, const Field& field, Value* out,
                            std::string* error) const {
     if (field.name == "__typename") { *out = Value::Str("Root"); return true; }
-    return op.kind == "mutation" ? Mutate(field, out, error) : Query(field, out, error);
+    bool handled = false;
+    GetMetrics().requests++;
+    bool ok = Admin(op, field, out, error, &handled);
+    if (!handled && !store_->ApiEnabled()) { *error = "The data API is disabled in settings"; ok = false; }
+    else if (!handled) ok = op.kind == "mutation" ? Mutate(field, out, error) : Query(field, out, error);
+    if (!ok) GetMetrics().errors++;
+    return ok;
 }
 
 bool Resolvers::Query(const Field& field, Value* out, std::string* error) const {
     if (field.name == "motion") { *out = MotionValue(); return true; }
-    if (field.name == "sensors") {
-        *out = Value::Arr();
-        for (int i = 0; i < kSensorCount; ++i) out->Push(Describe(i));
-        return true;
-    }
     const Value* arg = field.Arg("name");
     int idx = field.name == "sensor" && arg ? FindSensor(arg->s) : FindSensor(field.name);
     if (idx < 0) { *error = "Unknown sensor field '" + field.name + "'"; return false; }
@@ -55,6 +61,7 @@ bool Resolvers::SetByName(const std::string& name, const Field& field, Value* ou
     int idx = FindSensor(name);
     if (idx < 0) { *error = "Unknown sensor '" + name + "'"; return false; }
     const SensorDef& def = kSensors[idx];
+    if (store_->Flags(idx) & kDisabled) { *error = "Sensor '" + name + "' is disabled in settings"; return false; }
     Sample current;
     store_->Read(idx, &current);
     const Value* values = field.Arg("values");

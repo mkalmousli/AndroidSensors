@@ -21,6 +21,7 @@ Event FlushComplete(int32_t handle) {
 bool Poller::Emit(int32_t handle, State& st, std::vector<Event>* out) {
     int idx = HandleToIndex(handle);
     const SensorDef& def = kSensors[idx];
+    if (store_ && (store_->Flags(idx) & kDisabled)) return false;  // switched off in settings
     Sample sample;
     if (!store_ || !store_->Read(idx, &sample)) {  // daemon not up yet: use catalog defaults
         for (int i = 0; i < def.n; ++i) sample.v[i] = def.init[i];

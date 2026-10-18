@@ -7,6 +7,7 @@ bool Resolvers::Trigger(const Field& field, Value* out, std::string* error) cons
     rest[0] = char(tolower(rest[0]));
     int idx = FindSensor(rest);
     if (idx < 0) { *error = "Unknown sensor '" + rest + "'"; return false; }
+    if (store_->Flags(idx) & kDisabled) { *error = "Sensor '" + rest + "' is disabled in settings"; return false; }
     Sample current;
     store_->Read(idx, &current);
     current.v[0] += 1;

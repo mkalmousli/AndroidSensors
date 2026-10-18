@@ -10,4 +10,7 @@ void Handle(int fd, const Request& req, const Resolvers& resolvers, Store* store
 // Stream a subscription as server-sent events until the client disconnects.
 void StreamSubscription(int fd, const Operation& op, const Resolvers& resolvers, Store* store);
 
+// Stream sensor updates as server-sent events (settings page, live view).
+void StreamEvents(int fd, const Request& req, const Resolvers& resolvers, Store* store);
+
 }  // namespace andros

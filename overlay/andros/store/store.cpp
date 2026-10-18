@@ -30,7 +30,10 @@ Store* Store::Open(const char* path, bool writer) {
     if (map == MAP_FAILED) return nullptr;
     auto* store = new Store(static_cast<Header*>(map), writer);
     if (writer && (store->hdr_->magic != kMagic || store->hdr_->count != kSensorCount)) {
+        for (int i = 0; i < kSensorCount; ++i) store->slots_[i].flags = 0;
+        store->hdr_->api_off = 0;
         for (int i = 0; i < kSensorCount; ++i) store->Write(i, kSensors[i].init, kSensors[i].n);
+        for (int i = 0; i < kSensorCount; ++i) store->slots_[i].writes = 0;  // defaults aren't updates
         store->hdr_->count = kSensorCount;
         store->hdr_->magic = kMagic;
     }
@@ -58,6 +61,8 @@ bool Store::Read(int idx, Sample* out) const {
 void Store::Write(int idx, const double* values, int n) {
     if (!writer_ || idx < 0 || idx >= kSensorCount) return;
     Slot& s = slots_[idx];
+    if (s.flags.load(std::memory_order_relaxed) & kDisabled) return;
+    s.writes.fetch_add(1, std::memory_order_relaxed);
     uint32_t seq = s.seq.load(std::memory_order_relaxed);
     s.seq.store(seq + 1, std::memory_order_release);
     std::atomic_thread_fence(std::memory_order_release);
