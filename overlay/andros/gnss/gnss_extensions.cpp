@@ -1,5 +1,6 @@
 // Optional IGnss extensions. Psds and Configuration are no-op stubs (the framework crashes on null);
-// the rest report "unavailable".
+// the rest return an error status so the framework treats them as unavailable (an ok status with a
+// null interface makes it dereference null).
 #include "andros_gnss.h"
 #include "gnss_stubs.h"
 
@@ -8,7 +9,7 @@ namespace andros {
 #define ANDROS_NO_EXTENSION(method, type)                         \
     ScopedAStatus AndrosGnss::method(std::shared_ptr<type>* out) { \
         *out = nullptr;                                            \
-        return ScopedAStatus::ok();                                \
+        return ScopedAStatus::fromExceptionCode(EX_UNSUPPORTED_OPERATION); \
     }
 
 ScopedAStatus AndrosGnss::getExtensionPsds(std::shared_ptr<gnss::IGnssPsds>* out) {
