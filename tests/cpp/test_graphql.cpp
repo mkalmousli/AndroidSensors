@@ -4,6 +4,7 @@
 #include <unistd.h>
 
 #include "resolvers.h"
+#include "route.h"
 
 using namespace andros;
 
@@ -53,7 +54,24 @@ static void TestStoreAndResolvers() {
     unlink(path);
 }
 
+static void TestRoute() {
+    Pt a{52.0, 13.0, 100}, b{52.0, 13.001, 100};
+    double d = HaversineM(a, b);
+    CHECK(d > 65 && d < 70);                               // ~68 m per 0.001 deg lon at 52N
+    CHECK(BearingDeg(a, b) > 89 && BearingDeg(a, b) < 91);  // due east
+    CHECK(PressureAt(0) > 1013 && PressureAt(100) < PressureAt(0));
+    Route r({a, b, {52.0, 13.002, 130}}, 1.4, false);
+    for (int i = 0; i < 200; ++i) r.Advance(1.0);           // 136 m total: reaches the end
+    CHECK(r.Done() && r.Now().steps > 50);
+    CHECK(r.Now().floors >= 9 && r.Now().activity == "still");  // climbed 30 m = 10 floors
+    Route w({a, b}, 1.4, true);
+    w.Advance(1.0);
+    CHECK(std::string(w.Now().activity) == "walking" && w.Now().cadence_hz > 1.5);
+    CHECK(std::string(ActivityFor(3.0)) == "running" && std::string(ActivityFor(20)) == "vehicle");
+}
+
 int main() {
+    TestRoute();
     TestJson();
     TestParser();
     TestStoreAndResolvers();

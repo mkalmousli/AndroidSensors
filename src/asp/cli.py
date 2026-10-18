@@ -3,6 +3,7 @@ import argparse
 import sys
 from pathlib import Path
 
+from . import route
 from .cloud import cli as cloud_cli
 from .config import Config
 from .render import render_all
@@ -30,12 +31,18 @@ def main(argv: list[str] | None = None) -> int:
     sub.add_parser("release", help="sync, patch, build, package and publish a GitHub Release")
     r = sub.add_parser("render", help="render generated files only (no AOSP needed)")
     r.add_argument("--out", type=Path, default=Path("build/gen"))
+    g = sub.add_parser("route", help="replay a GPX track (needs a running device on :8000)")
+    g.add_argument("gpx")
+    g.add_argument("--speed", type=float, default=1.4, help="metres per second")
+    g.add_argument("--loop", action="store_true")
     cloud_cli.register(sub)
     args = p.parse_args(argv)
     cfg = Config()
 
     if args.cmd == "cloud":
         cloud_cli.run(args)
+    elif args.cmd == "route":
+        print(route.play(args.gpx, args.speed, args.loop))
     elif args.cmd == "render":
         render_all(args.out)
     elif args.cmd == "build":

@@ -18,10 +18,13 @@ class Resolvers {
   private:
     bool Query(const Field& field, Value* out, std::string* error) const;
     bool Mutate(const Field& field, Value* out, std::string* error) const;
+    bool Trigger(const Field& field, Value* out, std::string* error) const;  // trigger<Name>
     bool SetByName(const std::string& name, const Field& field, Value* out, std::string* error) const;
     Store* store_;
 };
 
 int FindSensor(const std::string& name);  // -1 when unknown
+bool RouteMutation(Store* store, const Field& field, Value* out, std::string* error);
+Value MotionValue();
 
 }  // namespace andros
