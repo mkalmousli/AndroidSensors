@@ -5,6 +5,7 @@
 #include <android/hardware/sensors/2.1/types.h>
 
 #include "catalog_gen.h"
+#include "device_gen.h"
 
 namespace andros {
 

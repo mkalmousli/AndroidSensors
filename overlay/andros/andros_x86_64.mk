@@ -6,9 +6,9 @@ PRODUCT_COPY_FILES += \
 
 $(call inherit-product, device/generic/goldfish/64bitonly/product/sdk_phone64_x86_64.mk)
 include vendor/andros/gen/andros_features.mk
+include vendor/andros/gen/device.mk
 
 PRODUCT_NAME := andros_x86_64
-PRODUCT_MODEL := Android device with real sensors
 
 PRODUCT_PACKAGES += andros_graphqld andros_sensors_subhal andros_health andros_gnss
 

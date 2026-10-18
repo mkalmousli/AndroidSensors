@@ -4,6 +4,7 @@ from pathlib import Path
 from jinja2 import Environment, FileSystemLoader, StrictUndefined
 
 from .catalog import ROOT, Sensor, load
+from .device import DEVICE, Device
 
 TEMPLATES = ROOT / "templates"
 
@@ -23,7 +24,7 @@ def feature_names(sensors: list[Sensor]) -> list[str]:
     return sorted({f"android.hardware.sensor.{s.feature}" for s in sensors if s.feature})
 
 
-def render_all(out: Path, sensors: list[Sensor] | None = None) -> list[Path]:
+def render_all(out: Path, sensors: list[Sensor] | None = None, device: Device = DEVICE) -> list[Path]:
     sensors = sensors if sensors is not None else load()
     env = _env()
     out.mkdir(parents=True, exist_ok=True)
@@ -38,6 +39,11 @@ def render_all(out: Path, sensors: list[Sensor] | None = None) -> list[Path]:
     for feat in features:
         path = out / "features" / f"{feat}.xml"
         path.write_text(env.get_template("feature.xml.j2").render(feature=feat))
+        written.append(path)
+
+    for name in ("device_gen.h", "device.mk"):
+        path = out / name
+        path.write_text(env.get_template(name + ".j2").render(d=device))
         written.append(path)
 
     mk = out / "andros_features.mk"

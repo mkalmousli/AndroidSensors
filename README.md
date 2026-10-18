@@ -118,6 +118,9 @@ Edit the list in `src/asp/sensors.py` (name, Android type id, fields, range, rat
 fields (`<name>`, `set<Name>`), HAL registration and feature flags are all generated. `make quick`
 rebuilds only our modules.
 
+The device identity (brand, model, fingerprint, locale, timezone, battery size, vendor strings, extra
+properties) is one editable dataclass in `src/asp/device.py`. Edit it, run `asp patch`, rebuild.
+
 ## Development (no Android needed)
 `make test` runs the Python tests, the C++ GraphQL/store/poller tests (host-built), ruff and the
 100-lines-per-file check. `uv run asp --help` lists pipeline steps (`sync patch build run verify doctor`).

@@ -34,8 +34,8 @@ SensorInfo MakeInfo(int32_t handle) {
     const SensorDef& def = kSensors[HandleToIndex(handle)];
     SensorInfo info{};
     info.sensorHandle = handle;
-    info.name = std::string("Andros ") + def.name;
-    info.vendor = "Andros";
+    info.name = std::string(gen::kSensorVendor) + " " + def.name;
+    info.vendor = gen::kSensorVendor;
     info.version = 1;
     info.type = static_cast<SensorType>(def.type);
     info.typeAsString = "";

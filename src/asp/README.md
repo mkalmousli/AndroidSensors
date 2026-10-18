@@ -5,6 +5,7 @@ The `asp` command line (`uv run asp --help`): the pipeline that patches, builds,
 | Path | Role |
 |---|---|
 | `sensors.py` | **the sensor catalog** (Python data): edit it to add or change a sensor |
+| `device.py` | **the device profile** (Python data): brand, model, fingerprint, locale, battery, vendor strings |
 | `catalog.py` | `Sensor` model and validation |
 | `render.py` | renders `templates/` from the catalog (C++ table, feature XMLs, makefile) |
 | `config.py` | settings, overridable with `ASP_*` environment variables |

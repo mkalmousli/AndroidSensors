@@ -1,4 +1,5 @@
 #include "andros_health.h"
+#include "device_gen.h"
 
 #include <cstdlib>
 
@@ -14,7 +15,7 @@ constexpr int kBatteryIndex = [] {
         if (kSensors[i].hal == Hal::kHealth) return i;
     return -1;
 }();
-constexpr int kCapacityUah = 3000000;  // advertised 3000 mAh pack
+constexpr int kCapacityUah = gen::kBatteryMah * 1000;
 }  // namespace
 
 Store* AndrosHealth::store() {
@@ -28,6 +29,7 @@ void AndrosHealth::UpdateHealthInfo(HealthInfo* info) {
     const int level = int(s.v[0]);
     const bool charging = s.v[1] > 0.5, ac = s.v[4] > 0.5;
     info->batteryPresent = true;
+    info->batteryTechnology = gen::kBatteryTechnology;
     info->batteryLevel = level;
     info->batteryStatus = !charging ? BatteryStatus::DISCHARGING
                                     : (level >= 100 ? BatteryStatus::FULL : BatteryStatus::CHARGING);

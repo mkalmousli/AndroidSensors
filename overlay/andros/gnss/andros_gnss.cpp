@@ -1,4 +1,5 @@
 #include "andros_gnss.h"
+#include "device_gen.h"
 
 #include <chrono>
 
@@ -21,7 +22,7 @@ ScopedAStatus AndrosGnss::setCallback(const std::shared_ptr<gnss::IGnssCallback>
     std::lock_guard<std::mutex> lock(mu_);
     cb_ = cb;
     cb->gnssSetCapabilitiesCb(0);
-    cb->gnssSetSystemInfoCb({2023, "Andros"});
+    cb->gnssSetSystemInfoCb({2023, gen::kGnssName});
     return ScopedAStatus::ok();
 }
 
