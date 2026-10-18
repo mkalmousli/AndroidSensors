@@ -5,6 +5,7 @@ import urllib.request
 
 from ..catalog import load
 from ..config import Config
+from ..device import DEVICE
 from ..sh import capture
 
 
@@ -27,7 +28,7 @@ def verify(cfg: Config) -> bool:
     results = []
     dump = capture(["adb", "shell", "dumpsys", "sensorservice"])
     for s in (s for s in load() if s.hal == "sensors"):
-        listed = f"andros {s.name}".lower() in dump.lower()
+        listed = f"{DEVICE.sensor_vendor} {s.name}".lower() in dump.lower()
         results.append(_check(listed, f"sensorservice lists {s.name}"))
     gql(cfg, 'mutation { setAmbientTemperature(celsius: 31) { ok } }')
     time.sleep(1)
