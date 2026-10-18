@@ -11,28 +11,16 @@ mutation { setLocation(lat: 52.52, lon: 13.4) { ok }  setAccelerometer(x: 0, y: 
 
 ## 1. Use it (no clone, no build)
 
-You need the [Android SDK](https://developer.android.com/studio) (for `emulator` and `avdmanager`) and a
-Linux machine with KVM.
+You need the [Android SDK](https://developer.android.com/studio) (the `emulator`) and a Linux machine with KVM,
+and about 9 GB of free disk.
 
-**Download** the latest build. It comes in parts because GitHub limits files to 2 GB:
 ```sh
-mkdir andros && cd andros
+# 1. download and unpack the image into your SDK
 U=https://github.com/mkalmousli/AndroidSensors/releases/latest/download
-curl -sLO $U/SHA256SUMS
-awk '{print $2}' SHA256SUMS | xargs -I{} curl -LO $U/{}
-sha256sum -c SHA256SUMS
-```
-
-**Join** the parts and unpack them into your SDK (needs ~9 GB free; delete `andros.zip` afterwards):
-```sh
-cat sdk-repo-*.zip.* > andros.zip
 D=$ANDROID_HOME/system-images/android-34/andros
-mkdir -p $D && unzip andros.zip -d $D
-```
+mkdir -p $D && curl -L $U/sdk-repo-linux-system-images-eng.root.zip.000 -o /tmp/andros.zip && unzip /tmp/andros.zip -d $D && rm /tmp/andros.zip
 
-**Create and start** the virtual device. `avdmanager` can't see a hand-unpacked image, so write the
-two small AVD files yourself:
-```sh
+# 2. create the virtual device (avdmanager can't see a hand-unpacked image, so write two small files)
 mkdir -p ~/.android/avd/andros.avd
 printf 'path=%s\ntarget=android-34\n' ~/.android/avd/andros.avd > ~/.android/avd/andros.ini
 cat > ~/.android/avd/andros.avd/config.ini <<EOF
@@ -49,16 +37,20 @@ disk.dataPartition.size=6G
 image.sysdir.1=system-images/android-34/andros/x86_64/
 tag.id=default
 EOF
+
+# 3. start it
 emulator -avd andros
 ```
 
-**Use the sensors** through GraphQL (here: set the light sensor to 900 lux):
+**Use the sensors:** open the settings page, or call the API (here: light sensor to 900 lux).
 ```sh
 adb forward tcp:8000 tcp:8000
+xdg-open http://localhost:8000/settings
 curl localhost:8000/graphql -d '{"query":"mutation { setLight(lux: 900) { ok } }"}'
 ```
 
-It is a normal emulator, so `scrcpy`, `adb` and your own Dockerfiles work as usual.
+It is a normal emulator, so `scrcpy`, `adb` and your own Dockerfiles work as usual. If the download
+is split into several parts (`.000`, `.001`, ...), join them first: `cat sdk-repo-*.zip.* > andros.zip`.
 
 ## 2. Build it yourself
 
@@ -133,12 +125,10 @@ properties) is one dataclass in `src/asp/device.py` with dummy defaults. Put you
 `make test` runs the Python tests, the C++ GraphQL/store/poller tests (host-built), ruff and the
 100-lines-per-file check. `uv run asp --help` lists pipeline steps (`sync patch build run verify doctor`).
 
-## Status / honesty
-Verified here: catalog rendering, patch step, GraphQL engine, store, poller (host unit tests).
-**Not yet verified on a real AOSP build** (needs KVM + hours): the HIDL/AIDL HAL glue
-(`sensors_subhal`, `gnss`, `health`), Soong module dependency names, SELinux rules and the
-stock-module `overrides:` for the pinned tag (`android-14.0.0_r1`, override with `ASP_BRANCH`).
-Expect a few iterations on the first build; `asp doctor` lists the stock modules to replace.
+## Status
+The image builds and boots on Android 14 (`android-14.0.0_r1`): the sensors, GNSS and health HALs run, the
+stock ones are replaced, and the GraphQL API and settings page work. Not done yet: GNSS raw
+measurements, ARM app translation, a native Android settings screen.
 
 ## License
 GPL-3.0-or-later, see [LICENSE](LICENSE).
