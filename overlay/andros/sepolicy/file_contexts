@@ -1,2 +1,4 @@
 /vendor/bin/graphqld                  u:object_r:andros_graphqld_exec:s0
 /data/vendor/andros(/.*)?             u:object_r:andros_data_file:s0
+/vendor/bin/hw/android.hardware.gnss-service.andros    u:object_r:hal_gnss_default_exec:s0
+/vendor/bin/hw/android.hardware.health-service.andros  u:object_r:hal_health_default_exec:s0

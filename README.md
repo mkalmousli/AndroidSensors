@@ -26,7 +26,8 @@ sha256sum -c SHA256SUMS
 **Join** the parts and unpack them into your SDK (needs ~9 GB free; delete `andros.zip` afterwards):
 ```sh
 cat sdk-repo-*.zip.* > andros.zip
-unzip andros.zip -d $ANDROID_HOME/system-images/android-34/andros
+D=$ANDROID_HOME/system-images/android-34/andros
+mkdir -p $D && unzip andros.zip -d $D
 ```
 
 **Create and start** the virtual device. `avdmanager` can't see a hand-unpacked image, so write the
