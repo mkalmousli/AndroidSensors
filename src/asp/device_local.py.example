@@ -1,0 +1,8 @@
+"""Copy to device_local.py (git-ignored) and edit. Any field you leave out keeps its dummy default."""
+from .device import Device
+
+DEVICE = Device(
+    model="My Test Phone",
+    battery_mah=5000,
+    properties=(("persist.example.flag", "1"),),
+)

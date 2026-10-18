@@ -119,7 +119,7 @@ fields (`<name>`, `set<Name>`), HAL registration and feature flags are all gener
 rebuilds only our modules.
 
 The device identity (brand, model, fingerprint, locale, timezone, battery size, vendor strings, extra
-properties) is one editable dataclass in `src/asp/device.py`. Edit it, run `asp patch`, rebuild.
+properties) is one dataclass in `src/asp/device.py` with dummy defaults. Put yours in git-ignored `src/asp/device_local.py` (copy `device_local.py.example`), run `asp patch`, rebuild.
 
 ## Development (no Android needed)
 `make test` runs the Python tests, the C++ GraphQL/store/poller tests (host-built), ruff and the

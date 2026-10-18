@@ -40,3 +40,17 @@ def test_device_codename_never_sets_product_device(tmp_path):
     render_all(tmp_path, device=Device(device="x1"))
     mk = (tmp_path / "device.mk").read_text()
     assert "\nPRODUCT_DEVICE" not in mk and "PRODUCT_SYSTEM_DEVICE := x1" in mk
+
+
+def test_every_device_field_is_rendered(tmp_path):
+    import dataclasses
+
+    from asp.device import Device
+    from asp.render import render_all
+
+    values = {f.name: f"v_{f.name}" for f in dataclasses.fields(Device) if f.type is str or f.type == "str"}
+    values.update(battery_mah=1234, properties=(("ro.k", "v_prop"),))
+    render_all(tmp_path, device=Device(**values))
+    out = (tmp_path / "device.mk").read_text() + (tmp_path / "device_gen.h").read_text()
+    missing = [k for k, v in values.items() if k != "properties" and str(v) not in out]
+    assert not missing and "v_prop" in out, f"ignored fields: {missing}"
